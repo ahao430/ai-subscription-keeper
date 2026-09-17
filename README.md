@@ -157,7 +157,7 @@ make docker   # 构建 Docker 镜像
 
 ## 致谢
 
-- [linux.do](https://linux.do/) 社区 —— 众多 AI 订阅实践与供应商额度接口的灵感来源
+- [linux.do](https://linux.do/) —— 学AI，到L站
 
 ## License
 
