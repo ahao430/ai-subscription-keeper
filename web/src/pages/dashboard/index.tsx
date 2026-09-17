@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Badge,
   Button,
   Col,
   Modal,
+  Popconfirm,
   Row,
   Select,
   Space,
@@ -23,6 +25,7 @@ import {
   LogoutOutlined,
   SettingOutlined,
   SyncOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons';
 import {
   DndContext,
@@ -143,6 +146,51 @@ export default function DashboardPage({ authEnabled = false }: { authEnabled?: b
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [notifyModalOpen, setNotifyModalOpen] = useState(false);
   const [settingModalOpen, setSettingModalOpen] = useState(false);
+
+  // 版本更新提示
+  const [updateInfo, setUpdateInfo] = useState<{
+    current_version: string;
+    latest_version: string;
+    update_available: boolean;
+    release_url: string;
+    notes?: string;
+  } | null>(null);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+
+  useEffect(() => {
+    api.checkUpdate().then(setUpdateInfo).catch(() => {});
+  }, []);
+
+  async function doUpgrade() {
+    setUpgrading(true);
+    const prevVersion = updateInfo?.current_version || '';
+    try {
+      await api.upgradeVersion();
+      message.success('新版本已就位，服务正在重启…');
+      const deadline = Date.now() + 90_000;
+      const poll = window.setInterval(async () => {
+        try {
+          const v = await api.version();
+          if (v.version !== prevVersion) {
+            window.clearInterval(poll);
+            message.success(`已升级到 v${v.version.replace(/^v/, '')}，页面即将刷新`);
+            setTimeout(() => window.location.reload(), 1200);
+          }
+        } catch {
+          /* 服务重启中 */
+        }
+        if (Date.now() > deadline) {
+          window.clearInterval(poll);
+          message.warning('服务未在 90 秒内切换到新版本，请稍后手动刷新或检查更新');
+          setUpgrading(false);
+        }
+      }, 2000);
+    } catch (e) {
+      message.error(`升级失败: ${(e as Error).message}`);
+      setUpgrading(false);
+    }
+  }
 
   const loadTasks = useCallback(async () => {
     try {
@@ -350,6 +398,18 @@ export default function DashboardPage({ authEnabled = false }: { authEnabled?: b
           <Button type="text" icon={<SettingOutlined />} onClick={() => setSettingModalOpen(true)}>
             <span className="cfg-btn-label">设置</span>
           </Button>
+          {updateInfo?.update_available && (
+            <Tooltip title={`发现新版本 ${updateInfo.latest_version}，点击升级`}>
+              <Badge dot status="processing">
+                <Button
+                  type="text"
+                  icon={<NotificationOutlined />}
+                  onClick={() => setUpdateModalOpen(true)}
+                  title="版本更新"
+                />
+              </Badge>
+            </Tooltip>
+          )}
           <Button
             type="text"
             icon={<GithubOutlined />}
@@ -653,6 +713,59 @@ export default function DashboardPage({ authEnabled = false }: { authEnabled?: b
       <PageModal open={settingModalOpen} maxWidth={680} onClose={() => setSettingModalOpen(false)}>
         <SettingsPage />
       </PageModal>
+
+      {/* 版本更新弹窗 */}
+      <Modal
+        open={updateModalOpen}
+        onCancel={() => setUpdateModalOpen(false)}
+        footer={null}
+        title="版本更新"
+        width={460}
+        destroyOnClose
+      >
+        {updateInfo && (
+          <div>
+            <Typography.Paragraph>
+              当前版本：<Text code>{updateInfo.current_version}</Text>
+              <br />
+              最新版本：<Text code style={{ color: '#52c41a' }}>
+                {updateInfo.latest_version}
+              </Text>
+            </Typography.Paragraph>
+            {updateInfo.notes && (
+              <Typography.Paragraph
+                type="secondary"
+                style={{ fontSize: 12, maxHeight: 200, overflow: 'auto' }}
+              >
+                {updateInfo.notes}
+              </Typography.Paragraph>
+            )}
+            <Space>
+              <Popconfirm
+                title={`升级到 ${updateInfo.latest_version}？服务将自动重启。`}
+                onConfirm={doUpgrade}
+              >
+                <Button type="primary" loading={upgrading}>
+                  一键升级
+                </Button>
+              </Popconfirm>
+              <Typography.Link
+                href={updateInfo.release_url}
+                target="_blank"
+                style={{ fontSize: 12 }}
+              >
+                查看 Release 说明
+              </Typography.Link>
+            </Space>
+            <Typography.Paragraph
+              type="secondary"
+              style={{ fontSize: 12, marginTop: 12, marginBottom: 0 }}
+            >
+              Docker 部署请改为拉取新镜像。
+            </Typography.Paragraph>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

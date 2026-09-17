@@ -157,7 +157,7 @@ make docker   # 构建 Docker 镜像
 
 ## 致谢
 
-- [linux.do](https://linux.do/) —— 学AI，到L站
+- [linux.do](https://linux.do/) —— 学AI，上L站
 
 ## License
 
