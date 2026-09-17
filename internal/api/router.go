@@ -18,6 +18,8 @@ func NewRouter(a *app.App) http.Handler {
 	mux.HandleFunc("GET /api/version", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"version": version.Version})
 	})
+	mux.HandleFunc("GET /api/version/update-check", handleCheckUpdate(a))
+	mux.HandleFunc("POST /api/version/upgrade", handleUpgrade(a))
 
 	// Provider types.
 	mux.HandleFunc("GET /api/provider-types", handleProviderTypes)

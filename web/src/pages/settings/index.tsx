@@ -95,6 +95,17 @@ export default function SettingsPage() {
   const [savingWebdav, setSavingWebdav] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
 
+  // 版本更新
+  const [updateInfo, setUpdateInfo] = useState<{
+    current_version: string;
+    latest_version: string;
+    update_available: boolean;
+    release_url: string;
+    notes?: string;
+  } | null>(null);
+  const [checking, setChecking] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+
   useEffect(() => {
     api
       .version()
@@ -241,6 +252,49 @@ export default function SettingsPage() {
       message.error(`恢复失败: ${(e as Error).message}`);
     } finally {
       setRestoring(false);
+    }
+  }
+
+  async function checkUpdate() {
+    setChecking(true);
+    setUpdateInfo(null);
+    try {
+      setUpdateInfo(await api.checkUpdate());
+    } catch (e) {
+      message.error(`检查更新失败: ${(e as Error).message}`);
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  async function upgradeNow() {
+    setUpgrading(true);
+    const prevVersion = version;
+    try {
+      await api.upgradeVersion();
+      message.success('新版本已就位，服务正在重启…');
+      // 轮询 /api/version，服务恢复且版本变化后自动刷新页面加载新前端
+      const deadline = Date.now() + 90_000;
+      const poll = window.setInterval(async () => {
+        try {
+          const v = await api.version();
+          if (v.version !== prevVersion) {
+            window.clearInterval(poll);
+            message.success(`已升级到 v${v.version.replace(/^v/, '')}，页面即将刷新`);
+            setTimeout(() => window.location.reload(), 1200);
+          }
+        } catch {
+          /* 服务重启中，继续等待 */
+        }
+        if (Date.now() > deadline) {
+          window.clearInterval(poll);
+          message.warning('升级仍在进行，请稍后手动刷新页面');
+          setUpgrading(false);
+        }
+      }, 2000);
+    } catch (e) {
+      message.error(`升级失败: ${(e as Error).message}`);
+      setUpgrading(false);
     }
   }
 
@@ -410,6 +464,60 @@ export default function SettingsPage() {
             />
           )}
         </Form>
+      </Card>
+
+      <Card title="版本更新" size="small" style={{ marginTop: 16 }}>
+        <Typography.Paragraph type="secondary" style={{ fontSize: 13 }}>
+          检查 GitHub Release 新版本，下载后自动替换程序并重启（前端内嵌于程序，重启后页面自动刷新）。
+          Docker 部署请改为拉取新镜像。
+        </Typography.Paragraph>
+        <Space wrap>
+          <Button loading={checking} onClick={checkUpdate}>
+            检查更新
+          </Button>
+          {updateInfo?.update_available && (
+            <Popconfirm
+              title={`升级到 ${updateInfo.latest_version}？服务将自动重启。`}
+              onConfirm={upgradeNow}
+            >
+              <Button type="primary" loading={upgrading}>
+                一键升级到 {updateInfo.latest_version}
+              </Button>
+            </Popconfirm>
+          )}
+          {updateInfo && !updateInfo.update_available && (
+            <Text type="secondary">
+              {updateInfo.current_version === 'dev'
+                ? `当前为开发版本，最新 Release：${updateInfo.latest_version}`
+                : `已是最新版本 v${updateInfo.current_version}`}
+            </Text>
+          )}
+          {updateInfo?.release_url && (
+            <Typography.Link
+              style={{ fontSize: 12 }}
+              href={updateInfo.release_url}
+              target="_blank"
+            >
+              查看Release说明
+            </Typography.Link>
+          )}
+        </Space>
+        {updateInfo?.update_available && updateInfo.notes && (
+          <pre
+            style={{
+              marginTop: 12,
+              background: 'rgba(255,255,255,0.06)',
+              padding: 10,
+              borderRadius: 6,
+              fontSize: 12,
+              maxHeight: 160,
+              overflow: 'auto',
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {updateInfo.notes}
+          </pre>
+        )}
       </Card>
 
       <Card title="日志清理" size="small" style={{ marginTop: 16 }}>

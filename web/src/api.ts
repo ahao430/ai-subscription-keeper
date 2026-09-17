@@ -44,6 +44,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const api = {
   // Version
   version: () => request<{ version: string }>('/api/version'),
+  checkUpdate: () =>
+    request<{
+      current_version: string;
+      latest_version: string;
+      update_available: boolean;
+      release_url: string;
+      published_at: string;
+      notes?: string;
+    }>('/api/version/update-check'),
+  upgradeVersion: (tag?: string) =>
+    request<{ ok: boolean; old_version: string; new_version: string; restarting: boolean }>(
+      '/api/version/upgrade',
+      { method: 'POST', body: JSON.stringify(tag ? { tag } : {}) },
+    ),
 
   // Provider types
   providerTypes: () =>
