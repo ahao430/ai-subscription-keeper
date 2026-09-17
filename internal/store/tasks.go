@@ -11,8 +11,9 @@ import (
 
 // Task types.
 const (
-	TaskTypeWarmup  = "warmup"
-	TaskTypeWebhook = "webhook"
+	TaskTypeWarmup   = "warmup"
+	TaskTypeWebhook  = "webhook"
+	TaskTypeReminder = "reminder"
 )
 
 // Task is a scheduled warmup or webhook job.

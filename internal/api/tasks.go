@@ -54,8 +54,16 @@ func validateTask(a *app.App, t *store.Task) error {
 	if strings.TrimSpace(t.Name) == "" {
 		return errStr("任务名称不能为空")
 	}
-	if t.Type != store.TaskTypeWarmup && t.Type != store.TaskTypeWebhook {
-		return errStr("任务类型必须是 warmup 或 webhook")
+	if t.Type != store.TaskTypeWarmup && t.Type != store.TaskTypeWebhook && t.Type != store.TaskTypeReminder {
+		return errStr("任务类型必须是 warmup、webhook 或 reminder")
+	}
+	if t.Type == store.TaskTypeReminder {
+		if len(t.NotificationChannelIDs) == 0 {
+			return errStr("定时提醒必须选择至少一个通知渠道")
+		}
+		if strings.TrimSpace(t.Prompt) == "" {
+			return errStr("请填写提醒文案")
+		}
 	}
 	if t.Type == store.TaskTypeWarmup {
 		if t.ModelServiceID == "" {

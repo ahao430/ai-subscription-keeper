@@ -509,6 +509,8 @@ export default function DashboardPage() {
                       <Space size={8}>
                         {r.type === 'warmup' ? (
                           <Tag color="blue">预热</Tag>
+                        ) : r.type === 'reminder' ? (
+                          <Tag color="orange">提醒</Tag>
                         ) : (
                           <Tag color="purple">Webhook</Tag>
                         )}
@@ -516,6 +518,11 @@ export default function DashboardPage() {
                         {r.type === 'warmup' && (
                           <Text type="secondary" style={{ fontSize: 12 }}>
                             {r.model_service_name} · {r.model}
+                          </Text>
+                        )}
+                        {r.type === 'reminder' && (
+                          <Text type="secondary" style={{ fontSize: 12 }} ellipsis>
+                            {r.prompt}
                           </Text>
                         )}
                       </Space>

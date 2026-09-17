@@ -99,7 +99,7 @@ export interface ModelService {
 export interface Task {
   id: string;
   name: string;
-  type: 'warmup' | 'webhook';
+  type: 'warmup' | 'webhook' | 'reminder';
   model_service_id: string;
   model: string;
   prompt: string;

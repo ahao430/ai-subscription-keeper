@@ -92,16 +92,85 @@ func (e *Executor) run(t *store.Task) error {
 	}
 	var status, result, errMsg string
 	var attempts int
-	if t.Type == store.TaskTypeWebhook {
+	switch t.Type {
+	case store.TaskTypeWebhook:
 		status, result, errMsg, attempts = e.runWebhook(t, exec.ID)
-	} else {
+	case store.TaskTypeReminder:
+		status, result, errMsg, attempts = e.runReminder(t, exec.ID)
+	default:
 		status, result, errMsg, attempts = e.runWarmup(t, exec.ID)
 	}
 	if err := e.store.FinishExecution(exec.ID, status, result, errMsg, attempts, time.Now().UTC()); err != nil {
 		return err
 	}
-	e.notifyResult(t, exec.ID, status, result, errMsg, attempts)
+	// 定时提醒本身就是通知推送，不再额外发送执行结果通知。
+	if t.Type != store.TaskTypeReminder {
+		e.notifyResult(t, exec.ID, status, result, errMsg, attempts)
+	}
 	return nil
+}
+
+// ------------------------------------------------------------------ reminder --
+
+// runReminder pushes the fixed reminder text (t.Prompt) to every configured
+// notification channel at the scheduled time.
+func (e *Executor) runReminder(t *store.Task, executionID string) (status, result, errMsg string, attempts int) {
+	if strings.TrimSpace(t.Prompt) == "" {
+		return store.ExecStatusFailed, "", "提醒文案为空", 0
+	}
+	if len(t.NotificationChannelIDs) == 0 {
+		return store.ExecStatusFailed, "", "未配置通知渠道", 0
+	}
+	loc := taskLocation(t.Timezone)
+	msg := notify.Message{
+		Event:   "task_reminder",
+		Title:   "⏰ " + t.Name,
+		Content: t.Prompt,
+		Task:    t.Name,
+		At:      time.Now().In(loc).Format(time.RFC3339),
+	}
+
+	type channelResult struct {
+		Channel string `json:"channel"`
+		Type    string `json:"type"`
+		OK      bool   `json:"ok"`
+		Error   string `json:"error,omitempty"`
+	}
+	var results []channelResult
+	for _, cid := range t.NotificationChannelIDs {
+		ch, err := e.store.GetNotificationChannel(cid)
+		if err != nil || !ch.Enabled {
+			results = append(results, channelResult{Channel: cid, OK: false, Error: "渠道不存在或已停用"})
+			continue
+		}
+		cfgJSON, err := e.enc.Decrypt(ch.Config)
+		if err != nil {
+			results = append(results, channelResult{Channel: ch.Name, Type: ch.Type, OK: false, Error: "解密配置失败: " + err.Error()})
+			continue
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		err = e.notifier.Send(ctx, ch.Type, cfgJSON, msg)
+		cancel()
+		if err != nil {
+			results = append(results, channelResult{Channel: ch.Name, Type: ch.Type, OK: false, Error: err.Error()})
+			continue
+		}
+		results = append(results, channelResult{Channel: ch.Name, Type: ch.Type, OK: true})
+	}
+
+	allOK := true
+	for _, r := range results {
+		if !r.OK {
+			allOK = false
+		}
+	}
+	b, _ := json.Marshal(results)
+	status = store.ExecStatusSuccess
+	if !allOK {
+		status = store.ExecStatusFailed
+		errMsg = "部分通知渠道发送失败"
+	}
+	return status, string(b), errMsg, 1
 }
 
 // ------------------------------------------------------------------ warmup --

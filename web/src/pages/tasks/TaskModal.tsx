@@ -32,7 +32,7 @@ export interface WebhookCfg {
 
 export interface TaskFormValues {
   name: string;
-  type: 'warmup' | 'webhook';
+  type: 'warmup' | 'webhook' | 'reminder';
   model_service_id?: string;
   model?: string;
   prompt?: string;
@@ -228,7 +228,7 @@ export default function TaskModal({
         type: values.type,
         model_service_id: values.type === 'warmup' ? values.model_service_id : '',
         model: values.type === 'warmup' ? values.model : '',
-        prompt: values.prompt || 'hi',
+        prompt: values.type === 'reminder' ? values.prompt : values.prompt || 'hi',
         cron: values.cron,
         timezone: values.timezone || 'Asia/Shanghai',
         webhook_config: webhookConfig,
@@ -278,6 +278,7 @@ export default function TaskModal({
                 options={[
                   { value: 'warmup', label: '模型预热' },
                   { value: 'webhook', label: 'Webhook' },
+                  { value: 'reminder', label: '定时提醒' },
                 ]}
               />
             </Form.Item>
@@ -325,6 +326,17 @@ export default function TaskModal({
             </Row>
             <Form.Item name="prompt" label="提示词">
               <Input placeholder="hi" />
+            </Form.Item>
+          </>
+        ) : taskType === 'reminder' ? (
+          <>
+            <Form.Item
+              name="prompt"
+              label="提醒文案"
+              rules={[{ required: true, message: '请填写提醒文案' }]}
+              help="到点后该文案将原样推送到下方选中的通知渠道"
+            >
+              <Input.TextArea rows={3} placeholder="记得检查各订阅的额度与续费时间～" />
             </Form.Item>
           </>
         ) : (
@@ -441,7 +453,7 @@ export default function TaskModal({
         </Row>
 
         <Row gutter={16}>
-          <Col span={8}>
+          <Col span={taskType === 'reminder' ? 12 : 8}>
             <Form.Item name="timezone" label="时区">
               <Select
                 showSearch
@@ -455,16 +467,20 @@ export default function TaskModal({
               />
             </Form.Item>
           </Col>
-          <Col span={4}>
-            <Form.Item name="retry_count" label="失败重试次数">
-              <InputNumber min={0} max={10} style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
-          <Col span={4}>
-            <Form.Item name="retry_interval_min" label="重试间隔(分)">
-              <InputNumber min={1} max={1440} style={{ width: '100%' }} />
-            </Form.Item>
-          </Col>
+          {taskType !== 'reminder' && (
+            <>
+              <Col span={4}>
+                <Form.Item name="retry_count" label="失败重试次数">
+                  <InputNumber min={0} max={10} style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col span={4}>
+                <Form.Item name="retry_interval_min" label="重试间隔(分)">
+                  <InputNumber min={1} max={1440} style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+            </>
+          )}
         </Row>
 
         <Row gutter={16}>
@@ -472,7 +488,8 @@ export default function TaskModal({
             <Form.Item
               name="notification_channel_ids"
               label="通知渠道（可多选）"
-              help="执行结束后同时推送到所有选中渠道"
+              rules={taskType === 'reminder' ? [{ required: true, message: '定时提醒必须选择通知渠道' }] : []}
+              help={taskType === 'reminder' ? '提醒文案将推送到所有选中渠道' : '执行结束后同时推送到所有选中渠道'}
             >
               <Select
                 mode="multiple"

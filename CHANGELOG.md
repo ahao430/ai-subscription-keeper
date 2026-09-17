@@ -11,6 +11,7 @@
 - 供应商卡片支持一键跳转**官网**（智谱 bigmodel.cn、Claude、OpenAI、DeepSeek、Kimi、MiniMax、百炼、NewAPI 等）
 - 智谱 Coding Plan 卡片新增「**用量统计**」直达链接（bigmodel.cn/coding-plan/personal/usage）
 - 新增 `AGENTS.md` 开发规范与 `CLAUDE.md`
+- **定时提醒任务**：第三种任务类型，到点把固定文案原样推送到选中的通知渠道（支持多渠道），无需模型请求；无渠道/空文案在前后端均强制校验
 
 ## [1.1.0] - 2026-09-17
 

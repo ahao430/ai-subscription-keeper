@@ -111,10 +111,12 @@ export default function TasksPage() {
             render: (v, r) => (
               <Space direction="vertical" size={0}>
                 <Typography.Text strong>{v}</Typography.Text>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }} ellipsis>
                   {r.type === 'warmup'
                     ? `模型预热 · ${r.model_service_name ?? '-'} · ${r.model}`
-                    : `Webhook · ${cronText(r.cron)}`}
+                    : r.type === 'reminder'
+                      ? `定时提醒 · ${r.prompt}`
+                      : `Webhook · ${cronText(r.cron)}`}
                 </Typography.Text>
               </Space>
             ),
@@ -124,7 +126,13 @@ export default function TasksPage() {
             dataIndex: 'type',
             width: 100,
             render: (v: string) =>
-              v === 'warmup' ? <Tag color="blue">模型预热</Tag> : <Tag color="purple">Webhook</Tag>,
+              v === 'warmup' ? (
+                <Tag color="blue">模型预热</Tag>
+              ) : v === 'reminder' ? (
+                <Tag color="orange">定时提醒</Tag>
+              ) : (
+                <Tag color="purple">Webhook</Tag>
+              ),
           },
           {
             title: '执行时间',
