@@ -4,6 +4,12 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.2.3] - 2026-09-18
+
+### 修复
+
+- 通知渠道表格「名称」列被「配置」列长 URL 挤窄导致一字一行：名称列固定 220px，配置列改用列级 ellipsis 自动截断
+
 ## [1.2.2] - 2026-09-18
 
 ### 修复
