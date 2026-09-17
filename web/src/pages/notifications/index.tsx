@@ -493,6 +493,7 @@ export default function NotificationsPage() {
           {
             title: '名称',
             dataIndex: 'name',
+            width: 160,
             render: (v, r) => (
               <Space>
                 <Typography.Text strong>{v}</Typography.Text>
@@ -502,8 +503,9 @@ export default function NotificationsPage() {
           },
           {
             title: '配置',
+            ellipsis: true,
             render: (_, r) => (
-              <Typography.Text type="secondary" ellipsis style={{ maxWidth: 360 }}>
+              <Typography.Text type="secondary">
                 {r.type === 'dingtalk' || r.type === 'feishu' || r.type === 'wecom'
                   ? r.webhook
                   : r.type === 'telegram'
