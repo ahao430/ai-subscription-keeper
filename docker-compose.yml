@@ -1,0 +1,16 @@
+services:
+  keeper:
+    build: .
+    container_name: ai-subscription-keeper
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # 凭证加密主密钥（推荐生产环境显式设置；缺省时自动生成并持久化到 /data/.secret.key）
+      WARMUP_ENCRYPTION_KEY: ${WARMUP_ENCRYPTION_KEY:-}
+      TZ: Asia/Shanghai
+    volumes:
+      - keeper-data:/data
+
+volumes:
+  keeper-data:

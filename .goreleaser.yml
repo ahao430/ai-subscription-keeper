@@ -1,0 +1,42 @@
+version: 2
+
+project_name: keeper
+
+# 前端由 CI / Makefile 在 goreleaser 之前构建并拷入 internal/webui/dist
+builds:
+  - id: keeper
+    main: ./cmd/server
+    binary: keeper
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X ai-subscription-keeper/internal/version.Version={{ .Version }}
+
+archives:
+  - format: tar.gz
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: '{{ incpatch .Version }}-next'
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
