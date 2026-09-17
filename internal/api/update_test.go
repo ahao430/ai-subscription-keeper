@@ -65,3 +65,45 @@ func TestExpectedAssetName(t *testing.T) {
 		t.Fatalf("asset name %q should start with %q", name, want)
 	}
 }
+
+func TestParseVersionOutput(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{"2026/09/17 10:00:00 ai-subscription-keeper v1.2.1\n", "v1.2.1"},
+		{"2026/09/17 10:00:00 ai-subscription-keeper dev\n", "dev"},
+		{"", ""},
+		{"\n\n", ""},
+	}
+	for _, c := range cases {
+		if got := parseVersionOutput(c.in); got != c.want {
+			t.Errorf("parseVersionOutput(%q)=%q want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestVerifyNewBinary(t *testing.T) {
+	// 用一个输出合法版本号的 shell 脚本模拟新二进制
+	tmp := t.TempDir()
+	bin := filepath.Join(tmp, "fakekeeper")
+	if err := os.WriteFile(bin, []byte("#!/bin/sh\necho '2026/09/17 ai-subscription-keeper v9.9.9'\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if runtime.GOOS == "windows" {
+		t.Skip("unix 脚本模拟仅在非 Windows 运行")
+	}
+	if err := verifyNewBinary(bin, "v9.9.9"); err != nil {
+		t.Fatalf("合法二进制不应报错: %v", err)
+	}
+	if err := verifyNewBinary(bin, "v1.0.0"); err == nil {
+		t.Fatal("版本不匹配应当报错")
+	}
+	// 损坏文件：无执行权限/非可执行内容 → 必须报错且不得替换线上文件
+	if err := os.WriteFile(bin, []byte("not an executable"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := verifyNewBinary(bin, "v9.9.9"); err == nil {
+		t.Fatal("损坏文件应当报错")
+	}
+}

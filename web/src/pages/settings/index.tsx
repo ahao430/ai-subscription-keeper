@@ -102,6 +102,8 @@ export default function SettingsPage() {
     update_available: boolean;
     release_url: string;
     notes?: string;
+    disk_version?: string;
+    pending_restart?: boolean;
   } | null>(null);
   const [checking, setChecking] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
@@ -288,7 +290,7 @@ export default function SettingsPage() {
         }
         if (Date.now() > deadline) {
           window.clearInterval(poll);
-          message.warning('升级仍在进行，请稍后手动刷新页面');
+          message.warning('服务未在 90 秒内切换到新版本，自动重启可能失败；请点击「检查更新」查看处理提示');
           setUpgrading(false);
         }
       }, 2000);
@@ -471,6 +473,25 @@ export default function SettingsPage() {
           检查 GitHub Release 新版本，下载后自动替换程序并重启（前端内嵌于程序，重启后页面自动刷新）。
           Docker 部署请改为拉取新镜像。
         </Typography.Paragraph>
+        {updateInfo?.pending_restart && (
+          <Alert
+            style={{ marginBottom: 12 }}
+            type="warning"
+            showIcon
+            message="新版本文件已就位，但服务进程仍在运行旧版本"
+            description={
+              <>
+                自动重启未完成。请手动重启服务进程后刷新本页（Docker 部署请重建容器）：
+                <br />
+                <Text code>systemctl restart keeper</Text>
+                {'　'}或{' '}
+                <Text code>
+                  kill $(pidof keeper) &amp;&amp; nohup ./keeper &gt;&gt; keeper.log 2&gt;&amp;1 &amp;
+                </Text>
+              </>
+            }
+          />
+        )}
         <Space wrap>
           <Button loading={checking} onClick={checkUpdate}>
             检查更新

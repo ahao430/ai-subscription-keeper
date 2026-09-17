@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -133,6 +134,10 @@ func handleCheckUpdate(a *app.App) http.HandlerFunc {
 		}
 		current := version.Version
 		available := current != "dev" && compareSemver(rel.TagName, current) > 0
+		// 探测磁盘上的二进制版本：若比运行中进程新，说明上次一键升级已完成
+		// 文件替换但进程重启失败，提示用户手动重启而不是再次升级。
+		disk := diskBinaryVersion()
+		pendingRestart := disk != "" && disk != "dev" && compareSemver(disk, current) > 0
 		notes := rel.Body
 		if len(notes) > 600 {
 			notes = notes[:600] + "…"
@@ -145,8 +150,64 @@ func handleCheckUpdate(a *app.App) http.HandlerFunc {
 			"published_at":      rel.PublishedAt,
 			"notes":             notes,
 			"asset_for_platform": expectedAssetName(),
+			"disk_version":      disk,
+			"pending_restart":   pendingRestart,
 		})
 	}
+}
+
+// diskBinaryVersion runs the on-disk executable with -version and returns the
+// version it reports ("dev" for local builds, "" when the probe fails).
+func diskBinaryVersion() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	// -version 的输出走 log（stderr），必须用 CombinedOutput 捕获
+	out, err := exec.CommandContext(ctx, exe, "-version").CombinedOutput()
+	if err != nil {
+		return ""
+	}
+	return parseVersionOutput(string(out))
+}
+
+// parseVersionOutput extracts the trailing version token from the log line
+// printed by `keeper -version` (e.g. "2026/09/17 ... ai-subscription-keeper v1.2.1").
+func parseVersionOutput(s string) string {
+	fields := strings.Fields(strings.TrimSpace(s))
+	if len(fields) == 0 {
+		return ""
+	}
+	return fields[len(fields)-1]
+}
+
+// verifyNewBinary executes the freshly written binary with -version and
+// requires it to report the expected release version. This catches truncated
+// downloads, wrong-architecture archives and broken executables BEFORE the
+// running binary is touched, so a failed upgrade can never take the service down.
+func verifyNewBinary(path, wantVersion string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, path, "-version")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("新版本可执行文件校验失败（下载可能不完整）: %v: %s", err, truncateText(string(out), 200))
+	}
+	got := parseVersionOutput(string(out))
+	if got != strings.TrimPrefix(wantVersion, "v") && got != wantVersion {
+		return fmt.Errorf("新版本校验失败: 期望 %s，实际输出 %q", wantVersion, got)
+	}
+	return nil
+}
+
+func truncateText(s string, n int) string {
+	s = strings.TrimSpace(s)
+	if len(s) <= n {
+		return s
+	}
+	return s[:n] + "…"
 }
 
 // extractBinaryFromArchive pulls the "keeper" executable out of a tar.gz/zip
@@ -296,10 +357,16 @@ func handleUpgrade(a *app.App) http.HandlerFunc {
 		}
 		exePath, _ = filepath.EvalSymlinks(exePath)
 
-		// 写入新文件 → 备份旧文件 → 原子替换
+		// 写入新文件 → 校验可执行 → 备份旧文件 → 原子替换
 		newPath := exePath + ".new"
 		if err := os.WriteFile(newPath, binBytes, 0o755); err != nil {
 			writeError(w, http.StatusInternalServerError, fmt.Errorf("写入新版本失败（Docker 内通常只读，请拉取新镜像）: %w", err))
+			return
+		}
+		// 动正在运行的服务之前先验证新文件能正常执行，坏包绝不落地。
+		if err := verifyNewBinary(newPath, rel.TagName); err != nil {
+			os.Remove(newPath)
+			writeError(w, http.StatusInternalServerError, err)
 			return
 		}
 		bakPath := exePath + ".old"
@@ -326,7 +393,7 @@ func handleUpgrade(a *app.App) http.HandlerFunc {
 		go func() {
 			time.Sleep(1 * time.Second)
 			if err := restartSelf(); err != nil {
-				fmt.Printf("[upgrade] 重启失败（新版本文件已就位，请手动重启）: %v\n", err)
+				log.Printf("[upgrade] 自动重启失败（新版本文件已就位，请在「检查更新」中按提示手动重启）: %v", err)
 			}
 		}()
 	}
