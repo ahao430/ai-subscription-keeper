@@ -1,5 +1,7 @@
 # AI 订阅管家 (AI Subscription Keeper)
 
+🌐 官网：<https://ahao430.github.io/ai-subscription-keeper/>
+
 统一管理你的多个 AI 订阅账号：状态看板、额度/余额监控、模型测试、定时预热、定时 Webhook、结果多渠道通知、全局网络代理。**单二进制部署，数据全部本地存储。**
 
 ```

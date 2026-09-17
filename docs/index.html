@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 订阅管家 — 统一管理你的 AI 订阅</title>
+  <meta name="description" content="统一管理多个 AI 订阅账号：额度监控看板、定时预热、定时提醒、10 种通知渠道推送。单二进制部署，数据本地存储。" />
+  <link rel="icon" href="logo.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#">
+        <img src="logo.png" alt="logo" />
+        <span>AI 订阅管家</span>
+      </a>
+      <div class="nav-links">
+        <a href="#features">功能</a>
+        <a href="#screenshots">截图</a>
+        <a href="#channels">通知渠道</a>
+        <a href="#install">安装</a>
+        <a class="github-btn" href="https://github.com/ahao430/ai-subscription-keeper" target="_blank" rel="noreferrer">GitHub</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-glow hero-glow-1"></div>
+    <div class="hero-glow hero-glow-2"></div>
+    <h1>统一管理你的 <span class="grad">AI 订阅</span></h1>
+    <p class="tagline">
+      额度监控看板 · 定时预热 · 定时提醒 · 多渠道推送通知<br />
+      单二进制部署，数据全部本地存储，凭证加密保存
+    </p>
+    <div class="hero-btns">
+      <a class="btn btn-primary" href="https://github.com/ahao430/ai-subscription-keeper/releases" target="_blank" rel="noreferrer">下载 Release</a>
+      <a class="btn btn-ghost" href="https://github.com/ahao430/ai-subscription-keeper" target="_blank" rel="noreferrer">查看源码</a>
+    </div>
+    <div class="hero-shot reveal">
+      <img src="screenshots/dashboard.jpg" alt="AI 订阅管家看板" />
+    </div>
+  </header>
+
+  <!-- Features -->
+  <section id="features" class="section">
+    <h2 class="section-title">核心功能</h2>
+    <div class="grid">
+      <div class="card reveal">
+        <div class="icon">📊</div>
+        <h3>状态看板</h3>
+        <p>供应商彩色卡片实时展示额度剩余百分比、重置时间、按量余额与套餐等级；自动定时刷新真实查询供应商；卡片拖拽排序。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">🔌</div>
+        <h3>11+ 供应商预设</h3>
+        <p>智谱 / Kimi / Claude / OpenAI / MiniMax / DeepSeek / 百炼 / NewAPI / Sub2API…官方模板只填令牌即可，另支持自定义 OpenAI 兼容端点。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">🔥</div>
+        <h3>定时预热</h3>
+        <p>Cron 调度流式模型请求 + 额度自动验证，失败按配置重试；三段式时间选择器（每天 / 每周 / 自定义 Cron）。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">⏰</div>
+        <h3>定时提醒</h3>
+        <p>到点把固定文案原样推送到选中渠道——"该续费了""检查额度"不再遗忘。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">🔔</div>
+        <h3>10 种通知渠道</h3>
+        <p>钉钉 / 飞书 / 企微 / Telegram / ntfy / Bark / Gotify / 邮件 / Webhook，单任务可多选并行推送，互不影响。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">🛡️</div>
+        <h3>本地与安全</h3>
+        <p>SQLite 本地存储，凭证 AES-256-GCM 加密；配置一键导出 / 导入、WebDAV 云端备份（坚果云模板）；版本检查与一键自升级。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots -->
+  <section id="screenshots" class="section section-alt">
+    <h2 class="section-title">界面截图</h2>
+    <div class="shots">
+      <figure class="shot reveal">
+        <img src="screenshots/dashboard.jpg" alt="看板首页" loading="lazy" />
+        <figcaption><strong>看板首页</strong> — 额度卡片、用量统计直达链接、定时任务执行状态一览</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="screenshots/notifications.jpg" alt="通知渠道配置" loading="lazy" />
+        <figcaption><strong>通知渠道</strong> — 10 种渠道，每个都有配置指引，支持测试发送</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="screenshots/tasks.jpg" alt="定时任务管理" loading="lazy" />
+        <figcaption><strong>定时任务</strong> — 预热 / Webhook / 提醒三类任务，执行记录与测试日志</figcaption>
+      </figure>
+      <figure class="shot reveal">
+        <img src="screenshots/settings.jpg" alt="系统设置" loading="lazy" />
+        <figcaption><strong>系统设置</strong> — 全局代理、配置备份、WebDAV 同步、日志清理、一键升级</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Channels -->
+  <section id="channels" class="section">
+    <h2 class="section-title">通知渠道</h2>
+    <p class="section-sub">任务结果、定时提醒可同时推送到多个渠道，单渠道失败不影响其他渠道</p>
+    <div class="chips">
+      <span class="chip">💬 钉钉机器人</span>
+      <span class="chip">🪶 飞书机器人</span>
+      <span class="chip">💼 企业微信机器人</span>
+      <span class="chip">✈️ Telegram Bot</span>
+      <span class="chip">📡 ntfy 推送</span>
+      <span class="chip">🍎 Bark (iOS)</span>
+      <span class="chip">🚀 Gotify</span>
+      <span class="chip">📮 邮件（QQ/Gmail/163/Outlook）</span>
+      <span class="chip">🔗 Generic Webhook</span>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section id="install" class="section section-alt">
+    <h2 class="section-title">三种安装方式</h2>
+    <div class="grid grid-3">
+      <div class="card reveal">
+        <div class="icon">📦</div>
+        <h3>预编译二进制（推荐）</h3>
+        <pre><code># 下载对应平台压缩包，解压即用
+./keeper
+# 打开 http://localhost:8080</code></pre>
+        <p class="muted">darwin / linux / windows · amd64 / arm64，前端已内嵌，零依赖。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">🐳</div>
+        <h3>Docker</h3>
+        <pre><code>docker compose up -d
+# 打开 http://localhost:8080</code></pre>
+        <p class="muted">数据持久化在 volume，配置经环境变量注入。</p>
+      </div>
+      <div class="card reveal">
+        <div class="icon">🛠️</div>
+        <h3>源码构建</h3>
+        <pre><code>make build   # 前端编译 → 嵌入 → go build
+./bin/keeper</code></pre>
+        <p class="muted">需要 Go 1.25+ 与 Node.js 20+。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>AI 订阅管家 · 数据本地存储 · <a href="https://github.com/ahao430/ai-subscription-keeper" target="_blank" rel="noreferrer">GitHub</a> · MIT License</p>
+    <p class="muted">本工具未内置登录认证，仅适用于本机或可信内网部署</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
