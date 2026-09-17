@@ -30,3 +30,6 @@ PLAN.md
 .video_agent/
 .zcode/
 out/
+
+# 前端构建缓存
+web/*.tsbuildinfo
