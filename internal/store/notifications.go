@@ -72,7 +72,9 @@ func (s *Store) GetNotificationChannel(id string) (*NotificationChannel, error) 
 
 func (s *Store) CreateNotificationChannel(c *NotificationChannel) error {
 	now := time.Now().UTC()
-	c.ID = uuid.NewString()
+	if c.ID == "" {
+		c.ID = uuid.NewString()
+	}
 	c.CreatedAt, c.UpdatedAt = now, now
 	_, err := s.db.Exec(`INSERT INTO notification_channels (`+channelCols+`) VALUES (?,?,?,?,?,?,?)`,
 		c.ID, c.Name, c.Type, c.Config, boolInt(c.Enabled), c.CreatedAt.Format(time.RFC3339), c.UpdatedAt.Format(time.RFC3339))

@@ -103,7 +103,9 @@ func (s *Store) GetTask(id string) (*Task, error) {
 
 func (s *Store) CreateTask(t *Task) error {
 	now := time.Now().UTC()
-	t.ID = uuid.NewString()
+	if t.ID == "" {
+		t.ID = uuid.NewString()
+	}
 	t.CreatedAt, t.UpdatedAt = now, now
 	if t.Timezone == "" {
 		t.Timezone = "Asia/Shanghai"

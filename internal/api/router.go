@@ -65,6 +65,13 @@ func NewRouter(a *app.App) http.Handler {
 	mux.HandleFunc("GET /api/settings/proxy", handleGetProxy(a))
 	mux.HandleFunc("PUT /api/settings/proxy", handlePutProxy(a))
 	mux.HandleFunc("POST /api/settings/proxy/test", handleTestProxy(a))
+	mux.HandleFunc("GET /api/settings/export", handleExportConfig(a))
+	mux.HandleFunc("POST /api/settings/import", handleImportConfig(a))
+	mux.HandleFunc("GET /api/settings/webdav", handleGetWebdavConfig(a))
+	mux.HandleFunc("PUT /api/settings/webdav", handlePutWebdavConfig(a))
+	mux.HandleFunc("POST /api/settings/webdav/test", handleTestWebdav(a))
+	mux.HandleFunc("POST /api/settings/webdav/sync", handleWebdavSync(a))
+	mux.HandleFunc("POST /api/settings/webdav/restore", handleWebdavRestore(a))
 
 	// Embedded frontend (SPA with history fallback).
 	dist, err := fs.Sub(webui.Dist, "dist")

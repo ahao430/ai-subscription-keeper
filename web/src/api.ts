@@ -131,7 +131,52 @@ export const api = {
       '/api/settings/proxy/test',
       { method: 'POST', body: JSON.stringify(body) },
     ),
+
+  // Config backup: export / import
+  importConfig: (backupJSON: string) =>
+    request<Record<string, number>>('/api/settings/import', {
+      method: 'POST',
+      body: backupJSON,
+    }),
+
+  // WebDAV sync
+  getWebdav: () =>
+    request<{
+      server: string;
+      username: string;
+      path: string;
+      password_set: boolean;
+      last_sync: string;
+    }>('/api/settings/webdav'),
+  putWebdav: (body: { server: string; username: string; password?: string; path: string }) =>
+    request<unknown>('/api/settings/webdav', { method: 'PUT', body: JSON.stringify(body) }),
+  testWebdav: () =>
+    request<{ ok: boolean; error?: string | null; latency_ms: number }>(
+      '/api/settings/webdav/test',
+      { method: 'POST' },
+    ),
+  webdavSync: () =>
+    request<{ ok: boolean; size: number; synced_at: string }>('/api/settings/webdav/sync', {
+      method: 'POST',
+    }),
+  webdavRestore: () =>
+    request<Record<string, number>>('/api/settings/webdav/restore', { method: 'POST' }),
 };
+
+/** Downloads the config backup as a JSON file. */
+export async function downloadConfigBackup(): Promise<void> {
+  const res = await fetch('/api/settings/export');
+  if (!res.ok) throw new Error(`导出失败: HTTP ${res.status}`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ai-subscription-keeper-backup-${new Date()
+    .toISOString()
+    .slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export interface RawResponseLite {
   url: string;

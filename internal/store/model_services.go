@@ -110,7 +110,9 @@ func (s *Store) GetModelService(id string) (*ModelService, error) {
 
 func (s *Store) CreateModelService(ms *ModelService) error {
 	now := time.Now().UTC()
-	ms.ID = uuid.NewString()
+	if ms.ID == "" {
+		ms.ID = uuid.NewString()
+	}
 	ms.CreatedAt, ms.UpdatedAt = now, now
 	if ms.DefaultTestPrompt == "" {
 		ms.DefaultTestPrompt = "hi"
