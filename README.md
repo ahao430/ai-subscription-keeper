@@ -109,6 +109,8 @@ make dev-web   # 终端 2：前端 dev server :5173（/api 代理到 8080）
 | `PORT` | `8080` | HTTP 端口 |
 | `DATA_DIR` | `./data` | SQLite 与密钥文件目录 |
 | `WARMUP_ENCRYPTION_KEY` | 自动生成 | 凭证加密主密钥（AES-256-GCM） |
+| `AUTH_USERNAME` | `admin` | 内置登录用户名 |
+| `AUTH_PASSWORD` | 空（免认证） | 设置后启用内置登录（bcrypt 校验 + 会话 + 失败锁定） |
 
 > 未设置 `WARMUP_ENCRYPTION_KEY` 时自动生成并持久化到 `DATA_DIR/.secret.key`；生产环境建议显式设置。
 
@@ -116,7 +118,8 @@ make dev-web   # 终端 2：前端 dev server :5173（/api 代理到 8080）
 
 - 令牌 / System Token / Secret / SMTP 密码等凭证 **AES-256-GCM 加密存储**，API 永不回传明文
 - 原始数据与日志中的 Token、Authorization 等敏感字段自动脱敏
-- ⚠️ **本工具未内置登录认证**，仅适用于本机或可信内网部署；如需公网访问请自行加反向代理 + 认证（如 nginx basic auth / Cloudflare Access）
+- **内置登录（可选）**：设置环境变量 `AUTH_PASSWORD` 后启用——bcrypt 密码校验、HttpOnly 会话 Cookie（7 天滑动有效、HTTPS 自动 Secure）、连续失败 5 次锁定 15 分钟；留空则为免认证模式（本机/内网）
+- ⚠️ 公网部署建议：开启内置登录（或反代层 Basic Auth / Cloudflare Access），Docker 端口绑定 `127.0.0.1:8080:8080` 只经反代暴露，并全程 HTTPS
 
 ## 技术栈
 

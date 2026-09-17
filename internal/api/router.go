@@ -14,6 +14,11 @@ import (
 func NewRouter(a *app.App) http.Handler {
 	mux := http.NewServeMux()
 
+	// Auth.
+	mux.HandleFunc("GET /api/auth/status", handleAuthStatus(a))
+	mux.HandleFunc("POST /api/login", handleLogin(a))
+	mux.HandleFunc("POST /api/logout", handleLogout(a))
+
 	// Version.
 	mux.HandleFunc("GET /api/version", func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]string{"version": version.Version})
@@ -100,5 +105,5 @@ func NewRouter(a *app.App) http.Handler {
 		_, _ = w.Write(index)
 	})
 
-	return mux
+	return authMiddleware(a, mux)
 }

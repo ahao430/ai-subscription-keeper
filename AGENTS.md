@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-单二进制的 AI 订阅管理工具：Go 1.25 后端 + React 18 前端（`go:embed` 内嵌）+ SQLite（modernc 纯 Go，无 CGO）。凭证 AES-256-GCM 加密存储。面向本机/内网部署，**无内置登录认证**——不要引入任何假设公网暴露的设计。
+单二进制的 AI 订阅管理工具：Go 1.25 后端 + React 18 前端（`go:embed` 内嵌）+ SQLite（modernc 纯 Go，无 CGO）。凭证 AES-256-GCM 加密存储。**内置登录为可选**：`AUTH_PASSWORD` 环境变量留空 = 免认证（本机/内网），设置后启用登录页（`internal/auth`，会话 Cookie + bcrypt + 失败锁定）；新增 API 时无需关心认证，中间件在 `internal/api/auth.go` 统一拦截 `/api/*`（`/api/login`、`/api/auth/status` 与静态资源除外）。
 
 ## 常用命令
 

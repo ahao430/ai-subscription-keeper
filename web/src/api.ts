@@ -31,6 +31,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   } catch {
     /* non-JSON body */
   }
+  if (res.status === 401) {
+    // 会话失效：刷新页面，启动流程会引导到登录页
+    window.location.reload();
+    throw new ApiError(401, '未登录');
+  }
   if (!res.ok) {
     const msg =
       data && typeof data === 'object' && 'error' in data
@@ -42,6 +47,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Auth
+  authStatus: () =>
+    request<{ auth_required: boolean; logged_in: boolean }>('/api/auth/status'),
+  login: (username: string, password: string) =>
+    request<{ ok: boolean }>('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+  logout: () => request<{ ok: boolean }>('/api/logout', { method: 'POST' }),
+
   // Version
   version: () => request<{ version: string }>('/api/version'),
   checkUpdate: () =>

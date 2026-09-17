@@ -9,6 +9,9 @@ services:
       # 凭证加密主密钥（推荐生产环境显式设置；缺省时自动生成并持久化到 /data/.secret.key）
       WARMUP_ENCRYPTION_KEY: ${WARMUP_ENCRYPTION_KEY:-}
       TZ: Asia/Shanghai
+      # 内置登录：设置 AUTH_PASSWORD 后启用登录页（公网部署建议开启，并只把端口绑定到反代）
+      AUTH_USERNAME: ${AUTH_USERNAME:-admin}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-}
     volumes:
       - keeper-data:/data
 

@@ -19,6 +19,7 @@ import {
   CaretRightOutlined,
   ClockCircleOutlined,
   CloudServerOutlined,
+  LogoutOutlined,
   SettingOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
@@ -121,7 +122,7 @@ function PageModal({
   );
 }
 
-export default function DashboardPage() {
+export default function DashboardPage({ authEnabled = false }: { authEnabled?: boolean }) {
   const [services, setServices] = useState<DashboardService[]>([]);
   const [details, setDetails] = useState<Record<string, ModelService>>({});
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -252,6 +253,15 @@ export default function DashboardPage() {
     }
   }
 
+  async function logout() {
+    try {
+      await api.logout();
+    } catch {
+      /* 忽略 */
+    }
+    window.location.reload();
+  }
+
   async function runTaskNow(t: Task) {
     try {
       await api.runTask(t.id);
@@ -339,6 +349,9 @@ export default function DashboardPage() {
           <Button type="text" icon={<SettingOutlined />} onClick={() => setSettingModalOpen(true)}>
             <span className="cfg-btn-label">设置</span>
           </Button>
+          {authEnabled && (
+            <Button type="text" icon={<LogoutOutlined />} onClick={logout} title="退出登录" />
+          )}
         </Space>
       </div>
 

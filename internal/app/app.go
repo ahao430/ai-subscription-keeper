@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"ai-subscription-keeper/internal/auth"
 	"ai-subscription-keeper/internal/config"
 	"ai-subscription-keeper/internal/crypto"
 	"ai-subscription-keeper/internal/httpclient"
@@ -33,6 +34,7 @@ type App struct {
 	Notifier *notify.Sender
 	Exec    *task.Executor
 	Sched   *scheduler.Scheduler
+	Auth    *auth.Manager
 }
 
 func New(cfg config.Config) (*App, error) {
@@ -78,11 +80,15 @@ func New(cfg config.Config) (*App, error) {
 	notifier := notify.NewSender(&http.Client{Timeout: 30 * time.Second})
 	executor := task.NewExecutor(st, enc, hc, notifier)
 	sched := scheduler.New(st, executor)
+	authMgr := auth.New(cfg.AuthUsername, cfg.AuthPassword)
 
-	a := &App{Cfg: cfg, Store: st, Enc: enc, HC: hc, Notifier: notifier, Exec: executor, Sched: sched}
+	a := &App{Cfg: cfg, Store: st, Enc: enc, HC: hc, Notifier: notifier, Exec: executor, Sched: sched, Auth: authMgr}
 	if err := sched.Start(); err != nil {
 		st.Close()
 		return nil, err
+	}
+	if authMgr.Enabled() {
+		fmt.Printf("内置登录已启用（用户 %s）；未设置 AUTH_PASSWORD 时为免认证模式\n", cfg.AuthUsername)
 	}
 	return a, nil
 }
