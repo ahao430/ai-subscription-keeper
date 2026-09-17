@@ -30,6 +30,7 @@ var zhipuCN = zhipu.Endpoints{
 var types = []provider.ProviderType{
 	{
 		Code: "zhipu", Name: "智谱", SupportsQuota: true, Official: true, Logo: "/logos/zhipu.svg",
+		Website: "https://bigmodel.cn", UsageURL: "https://bigmodel.cn/coding-plan/personal/usage",
 		AuthNote: "Coding Plan 令牌（cy- 开头）或 API Key",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true, Placeholder: "cy-xxxxxxxx 或 API Key"},
@@ -37,6 +38,7 @@ var types = []provider.ProviderType{
 	},
 	{
 		Code: "zhipu-global", Name: "智谱海外", SupportsQuota: true, Official: true, Logo: "/logos/zhipu.svg",
+		Website: "https://z.ai", UsageURL: "https://bigmodel.cn/coding-plan/personal/usage",
 		AuthNote: "Z.ai Coding Plan 令牌",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
@@ -44,6 +46,7 @@ var types = []provider.ProviderType{
 	},
 	{
 		Code: "claude", Name: "Claude", SupportsQuota: false, Official: true, Logo: "/logos/claude.svg",
+		Website: "https://claude.com",
 		AuthNote: "API Key 或 Claude Max OAuth 令牌",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
@@ -52,12 +55,14 @@ var types = []provider.ProviderType{
 	},
 	{
 		Code: "openai", Name: "GPT / Codex", SupportsQuota: false, Official: true, Logo: "/logos/openai.svg",
+		Website: "https://platform.openai.com",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
 		},
 	},
 	{
 		Code: "minimax", Name: "MiniMax", SupportsQuota: true, Official: true, Logo: "/logos/minimax.svg",
+		Website: "https://platform.minimaxi.com",
 		AuthNote: "Coding Plan 订阅令牌，额度查询使用同一令牌",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
@@ -65,6 +70,7 @@ var types = []provider.ProviderType{
 	},
 	{
 		Code: "kimi", Name: "Kimi", SupportsQuota: true, Official: true, Logo: "/logos/kimi.svg",
+		Website: "https://www.kimi.com",
 		AuthNote: "Kimi For Coding 订阅令牌",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
@@ -72,6 +78,7 @@ var types = []provider.ProviderType{
 	},
 	{
 		Code: "newapi", Name: "NewAPI", SupportsQuota: true, Official: false, Logo: "/logos/newapi.svg",
+		Website: "https://github.com/Calcium-Ion/new-api",
 		AuthNote: "额度查询需要控制台 System Token + 用户 ID",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌（sk-）", Type: "password", Required: true},
@@ -89,12 +96,14 @@ var types = []provider.ProviderType{
 	},
 	{
 		Code: "deepseek", Name: "DeepSeek", SupportsQuota: true, Official: true, Logo: "/logos/deepseek.svg",
+		Website: "https://platform.deepseek.com",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
 		},
 	},
 	{
 		Code: "bailian", Name: "百炼", SupportsQuota: false, Official: true, Logo: "/logos/bailian.svg",
+		Website: "https://bailian.aliyun.com",
 		Fields: []provider.Field{
 			{Name: "api_key", Label: "令牌", Type: "password", Required: true},
 		},

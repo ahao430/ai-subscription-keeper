@@ -20,6 +20,8 @@ type dashboardService struct {
 	ProviderType     string                `json:"provider_type"`
 	ProviderName     string                `json:"provider_name"`
 	ProviderLogo     string                `json:"provider_logo,omitempty"`
+	ProviderWebsite  string                `json:"provider_website,omitempty"`
+	ProviderUsageURL string                `json:"provider_usage_url,omitempty"`
 	Enabled          bool                  `json:"enabled"`
 	Status           string                `json:"status"` // ok | error | unknown
 	Quota            *provider.QuotaInfo   `json:"quota,omitempty"`
@@ -45,6 +47,8 @@ func buildDashboardCard(ms *store.ModelService) *dashboardService {
 		ProviderType:     ms.ProviderType,
 		ProviderName:     pt.Name,
 		ProviderLogo:     pt.Logo,
+		ProviderWebsite:  pt.Website,
+		ProviderUsageURL: pt.UsageURL,
 		Enabled:          ms.Enabled,
 		DefaultTestModel: ms.DefaultTestModel,
 		SortOrder:        ms.SortOrder,

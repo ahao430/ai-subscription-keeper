@@ -129,26 +129,48 @@ export default function ServiceCard({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {statusBadge}
           {errorPopover}
-          <Tag
-            style={{
-              marginRight: 0,
-              background: 'rgba(255,255,255,0.18)',
-              color: WHITE,
-              border: '1px solid rgba(255,255,255,0.25)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            {s.provider_logo && (
-              <img
-                src={s.provider_logo}
-                alt=""
-                style={{ width: 12, height: 12, display: 'inline-block' }}
-              />
+          <Space size={6}>
+            {s.provider_usage_url && (
+              <a
+                href={s.provider_usage_url}
+                target="_blank"
+                rel="noreferrer"
+                style={{ fontSize: 12, color: WHITE_80, textDecoration: 'underline dotted' }}
+                title="打开官网用量统计页面"
+              >
+                用量统计
+              </a>
             )}
-            {s.provider_name}
-          </Tag>
+            <a
+              href={s.provider_website || undefined}
+              target={s.provider_website ? '_blank' : undefined}
+              rel="noreferrer"
+              style={{ textDecoration: 'none' }}
+              title={s.provider_website ? `打开 ${s.provider_name} 官网` : undefined}
+            >
+              <Tag
+                style={{
+                  marginRight: 0,
+                  background: 'rgba(255,255,255,0.18)',
+                  color: WHITE,
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  cursor: s.provider_website ? 'pointer' : 'default',
+                }}
+              >
+                {s.provider_logo && (
+                  <img
+                    src={s.provider_logo}
+                    alt=""
+                    style={{ width: 12, height: 12, display: 'inline-block' }}
+                  />
+                )}
+                {s.provider_name}
+              </Tag>
+            </a>
+          </Space>
         </div>
 
         {!s.enabled && (

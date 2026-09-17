@@ -4,6 +4,14 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.1.1] - 2026-09-17
+
+### 新增
+
+- 供应商卡片支持一键跳转**官网**（智谱 bigmodel.cn、Claude、OpenAI、DeepSeek、Kimi、MiniMax、百炼、NewAPI 等）
+- 智谱 Coding Plan 卡片新增「**用量统计**」直达链接（bigmodel.cn/coding-plan/personal/usage）
+- 新增 `AGENTS.md` 开发规范与 `CLAUDE.md`
+
 ## [1.1.0] - 2026-09-17
 
 ### 新增

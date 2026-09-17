@@ -134,5 +134,7 @@ type ProviderType struct {
 	SupportsQuota bool    `json:"supports_quota"`
 	AuthNote      string  `json:"auth_note,omitempty"`
 	Official      bool    `json:"official"` // true = 官方预设, baseURL 不可修改
-	Logo          string  `json:"logo,omitempty"` // logo 图标路径，如 /logos/zhipu.svg
+	Logo          string  `json:"logo,omitempty"`          // logo 图标路径，如 /logos/zhipu.svg
+	Website       string  `json:"website,omitempty"`       // 供应商官网，看板卡片可跳转
+	UsageURL      string  `json:"usage_url,omitempty"`     // 用量统计页面（如智谱 Coding Plan）
 }

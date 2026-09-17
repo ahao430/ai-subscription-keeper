@@ -64,6 +64,8 @@ export interface DashboardService {
   provider_type: string;
   provider_name: string;
   provider_logo?: string;
+  provider_website?: string;
+  provider_usage_url?: string;
   enabled: boolean;
   status: 'ok' | 'error' | 'unknown';
   quota?: QuotaInfo;
