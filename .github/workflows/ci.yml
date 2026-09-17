@@ -21,14 +21,17 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
+      - name: Build frontend into embed dir
+        run: |
+          cd web && npm ci && npm run build
+          cd .. && rm -rf internal/webui/dist && cp -R web/dist internal/webui/dist
+
       - name: Go vet & test
         run: |
           go vet ./...
           go test ./...
 
-      - name: Build (frontend embed + backend)
+      - name: Build backend & smoke
         run: |
-          cd web && npm ci && npm run build
-          cd .. && rm -rf internal/webui/dist && cp -R web/dist internal/webui/dist
           go build -trimpath -ldflags "-s -w" -o /tmp/keeper ./cmd/server
           /tmp/keeper -version
