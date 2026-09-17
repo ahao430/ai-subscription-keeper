@@ -493,7 +493,7 @@ export default function NotificationsPage() {
           {
             title: '名称',
             dataIndex: 'name',
-            width: 160,
+            width: 220,
             render: (v, r) => (
               <Space>
                 <Typography.Text strong>{v}</Typography.Text>
