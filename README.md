@@ -155,6 +155,10 @@ make docker   # 构建 Docker 镜像
 
 发布流程：打 tag（如 `v1.0.1`）推送，GitHub Actions 自动构建多平台产物并发布 Release（CHANGELOG 记得同步更新）。
 
+## 致谢
+
+- [linux.do](https://linux.do/) 社区 —— 众多 AI 订阅实践与供应商额度接口的灵感来源
+
 ## License
 
 [MIT](./LICENSE)

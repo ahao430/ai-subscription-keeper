@@ -4,6 +4,14 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.2.1] - 2026-09-17
+
+### 优化
+
+- 工具栏自动刷新下拉与「全部刷新」按钮高度统一
+- 顶栏新增 GitHub 图标，点击直达仓库
+- README 致谢 linux.do 社区
+
 ## [1.2.0] - 2026-09-17
 
 ### 新增

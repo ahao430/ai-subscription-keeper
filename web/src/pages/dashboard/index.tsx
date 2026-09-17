@@ -19,6 +19,7 @@ import {
   CaretRightOutlined,
   ClockCircleOutlined,
   CloudServerOutlined,
+  GithubOutlined,
   LogoutOutlined,
   SettingOutlined,
   SyncOutlined,
@@ -349,6 +350,13 @@ export default function DashboardPage({ authEnabled = false }: { authEnabled?: b
           <Button type="text" icon={<SettingOutlined />} onClick={() => setSettingModalOpen(true)}>
             <span className="cfg-btn-label">设置</span>
           </Button>
+          <Button
+            type="text"
+            icon={<GithubOutlined />}
+            href="https://github.com/ahao430/ai-subscription-keeper"
+            target="_blank"
+            title="GitHub 仓库"
+          />
           {authEnabled && (
             <Button type="text" icon={<LogoutOutlined />} onClick={logout} title="退出登录" />
           )}
@@ -376,11 +384,10 @@ export default function DashboardPage({ authEnabled = false }: { authEnabled?: b
           </Text>
           <Space wrap>
             <Select
-              size="small"
               value={autoInterval}
               onChange={setAutoInterval}
               options={REFRESH_OPTIONS}
-              style={{ width: 92 }}
+              style={{ width: 96 }}
             />
             <Button
               icon={<SyncOutlined spin={refreshingAll || autoRefreshing} />}
