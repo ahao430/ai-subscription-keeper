@@ -20,11 +20,11 @@ builds:
       - -s -w -X ai-subscription-keeper/internal/version.Version={{ .Version }}
 
 archives:
-  - format: tar.gz
+  - formats: [tar.gz]
     name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
 
 checksum:
   name_template: 'checksums.txt'
