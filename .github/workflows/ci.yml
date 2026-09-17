@@ -24,7 +24,7 @@ jobs:
       - name: Build frontend into embed dir
         run: |
           cd web && npm ci && npm run build
-          cd .. && rm -rf internal/webui/dist && cp -R web/dist internal/webui/dist
+          cd .. && rm -rf internal/webui/dist/* && cp -R web/dist/* internal/webui/dist/
 
       - name: Go vet & test
         run: |

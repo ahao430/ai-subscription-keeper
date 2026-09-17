@@ -20,8 +20,8 @@ build: web-build
 
 web-build:
 	cd web && npm ci && npm run build
-	rm -rf internal/webui/dist
-	cp -R web/dist internal/webui/dist
+	rm -rf internal/webui/dist/*
+	cp -R web/dist/* internal/webui/dist/
 
 docker:
 	docker build -t ai-subscription-keeper .
