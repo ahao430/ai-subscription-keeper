@@ -17,7 +17,9 @@ make docker       # 构建镜像
 ./bin/keeper -version
 ```
 
-**发布**：更新 CHANGELOG → commit → `git tag vX.Y.Z && git push origin vX.Y.Z`，Actions 自动 goreleaser 出包。小改动升 patch（三位版本号的第三位），功能性改动升 minor。
+**发布（必须打 tag）**：更新 `CHANGELOG.md` 对应版本小节 → commit 并 push 到 main → `git tag vX.Y.Z && git push origin vX.Y.Z`。**只有推送 `v*` 标签才会触发 Release 工作流**（goreleaser 六平台出包并发布 GitHub Release）；只 push 代码不打 tag 不会有任何 Release。小改动升 patch（三位版本号的第三位），功能性改动升 minor。发布后可在应用「设置 → 版本更新」验证能查到新版本。
+
+**CI / Pages**：push 到 main 自动跑 CI（前端构建 → go vet/test → 冒烟）；`docs/` 目录变更自动重建 GitHub Pages 官网（https://ahao430.github.io/ai-subscription-keeper/）。注意 `internal/webui/dist/.gitkeep` 占位文件不能删——它是 fresh checkout 时 `go:embed` 的唯一匹配文件，删了 CI 会失败。
 
 ## 关键约定（容易踩坑）
 
